@@ -58,15 +58,8 @@ class Trainer(object):
                                                             transforms.ToTensor(),
                                                             transforms.Normalize((0.5,), (0.5,))
                                                         ]))
-        elif args.dataset == "cifar10":
-            dataset = torchvision.datasets.CIFAR10(root=args.dataroot, download=True,
-                                                   transform=transforms.Compose([
-                                                       transforms.Resize(args.image_size),
-                                                       transforms.ToTensor(),
-                                                       transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-                                                   ]))
-
         else:
+            logger.warning("You don't use current dataset. Default use MNIST dataset.")
             dataset = torchvision.datasets.MNIST(root=args.dataroot, download=True,
                                                  transform=transforms.Compose([
                                                      transforms.Resize(args.image_size),

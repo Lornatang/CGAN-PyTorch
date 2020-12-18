@@ -30,7 +30,7 @@ if __name__ == "__main__":
                                                  "technology for pathological microscopic images.")
     # basic parameters
     parser.add_argument("--dataset", type=str, required=True,
-                        help="mnist | fashion-mnist | cifar10 |.")
+                        help="mnist | fashion-mnist |.")
     parser.add_argument("--dataroot", type=str, default="data",
                         help="Path to dataset. (default: ``data``).")
     parser.add_argument("-j", "--workers", default=4, type=int, metavar="N",
@@ -50,8 +50,6 @@ if __name__ == "__main__":
                         help="model architecture: " +
                              " | ".join(model_names) +
                              " (default: mnist)")
-    parser.add_argument("--model-path", default="", type=str, metavar="PATH",
-                        help="Path to latest checkpoint for model. (default: ````).")
     parser.add_argument("--pretrained", dest="pretrained", action="store_true",
                         help="Use pre-trained model.")
     parser.add_argument("--netD", default="", type=str, metavar="PATH",

@@ -36,6 +36,10 @@ if __name__ == "__main__":
                         help="model architecture: " +
                              " | ".join(model_names) +
                              " (default: mnist)")
+    parser.add_argument("--image-size", type=int, default=28,
+                        help="The height / width of the input image to network. (default: 28).")
+    parser.add_argument("--channels", type=int, default=1,
+                        help="The number of channels of the image. (default: 1).")
     parser.add_argument("--num-classes", type=int, default=10,
                         help="Number of classes for dataset. (default: 10).")
     parser.add_argument("-n", "--num-images", type=int, default=64,
@@ -59,7 +63,7 @@ if __name__ == "__main__":
 
     logger.info("Creating Testing Engine")
     device = select_device(args.device)
-    model = torch.hub.load("Lornatang/GAN-PyTorch", args.arch, pretrained=True)
+    model = torch.hub.load("Lornatang/CGAN-PyTorch", args.arch, pretrained=True, image_size=args.image_size, channels=args.channels, num_classes=args.num_classes)
     model = model.to(device)
 
     noise = torch.randn(args.num_images, 100, device=device)

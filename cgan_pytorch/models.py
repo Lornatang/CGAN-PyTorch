@@ -17,13 +17,12 @@ from torch.hub import load_state_dict_from_url
 
 __all__ = [
     "Discriminator", "Generator", "discriminator",
-    "mnist", "fashion_mnist", "cifar10"
+    "mnist", "fashion_mnist"
 ]
 
 model_urls = {
     "mnist": "",
     "fashion-mnist": "",
-    "cifar10": ""
 }
 
 
@@ -154,13 +153,3 @@ def fashion_mnist(pretrained: bool = False, progress: bool = True) -> Generator:
         progress (bool): If True, displays a progress bar of the download to stderr
     """
     return _gan("fashion-mnist", 28, 1, 10, pretrained, progress)
-
-
-def cifar10(pretrained: bool = False, progress: bool = True) -> Generator:
-    r"""GAN model architecture from the
-    `"One weird trick..." <https://arxiv.org/abs/1411.1784>`_ paper.
-    Args:
-        pretrained (bool): If True, returns a model pre-trained on ImageNet
-        progress (bool): If True, displays a progress bar of the download to stderr
-    """
-    return _gan("cifar10", 32, 3, 10, pretrained, progress)
