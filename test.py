@@ -36,6 +36,8 @@ if __name__ == "__main__":
                         help="model architecture: " +
                              " | ".join(model_names) +
                              " (default: mnist)")
+    parser.add_argument("--num-classes", type=int, default=10,
+                        help="Number of classes for dataset. (default: 10).")
     parser.add_argument("-n", "--num-images", type=int, default=64,
                         help="How many samples are generated at one time. (default: 64).")
     parser.add_argument("--outf", default="test", type=str, metavar="PATH",
@@ -63,7 +65,7 @@ if __name__ == "__main__":
     noise = torch.randn(args.num_images, 100, device=device)
     conditional = torch.randint(0, args.num_classes, (args.num_images,), device=device)
     with torch.no_grad():
-        generated_images = model(noise)
+        generated_images = model(noise, conditional)
 
     vutils.save_image(generated_images, f"{args.outf}/test.bmp")
     print("##################################################\n")
