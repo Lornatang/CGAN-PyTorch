@@ -58,7 +58,6 @@ coverage.xml
 *.log
 local_settings.py
 db.sqlite3
-db.sqlite3-journal
 
 # Flask stuff:
 instance/
@@ -122,3 +121,20 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# IDE file
+.idea
+.vscode
+
+# Mac file
+.DS_Store
+
+# custom
+data/MNIST
+data/FashionMNIST
+data/cifar-10-python
+data/cifar-10-python.tar.gz
+data/cifar-10-batches-py
+
+output
+weights/*.pth
