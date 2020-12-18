@@ -131,6 +131,7 @@ class Trainer(object):
         logger.info(f"Training for {self.epochs} epochs")
 
         fixed_noise = torch.randn(args.batch_size, 100, device=self.device)
+        fixed_conditional = torch.randint(0, args.num_classes, (args.batch_size,), device=self.device)
 
         for epoch in range(args.start_epoch, self.epochs):
             progress_bar = tqdm(enumerate(self.dataloader), total=len(self.dataloader))
@@ -178,12 +179,12 @@ class Trainer(object):
 
                 progress_bar.set_description(f"[{epoch + 1}/{self.epochs}][{i + 1}/{len(self.dataloader)}] "
                                              f"Loss_D: {errD.item():.6f} Loss_G: {errG.item():.6f} "
-                                             f"D(HR): {D_x:.6f} D(G(LR)): {D_G_z1:.6f}/{D_G_z2:.6f}")
+                                             f"D(x): {D_x:.6f} D(G(z)): {D_G_z1:.6f}/{D_G_z2:.6f}")
 
                 # The image is saved every 1 epoch.
                 if (i + 1) % args.save_freq == 0:
                     vutils.save_image(input, os.path.join("output", "real_samples.bmp"))
-                    fake = self.generator(fixed_noise, fake_conditional)
+                    fake = self.generator(fixed_noise, fixed_conditional)
                     vutils.save_image(fake.detach(), os.path.join("output", f"fake_samples{epoch + 1}.bmp"))
 
             # do checkpointing
