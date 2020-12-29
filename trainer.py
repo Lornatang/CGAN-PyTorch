@@ -175,20 +175,20 @@ class Trainer(object):
                                              f"Loss_D: {errD.item():.6f} Loss_G: {errG.item():.6f} "
                                              f"D(x): {D_x:.6f} D(G(z)): {D_G_z1:.6f}/{D_G_z2:.6f}")
 
-                index = i + epoch * len(self.dataloader) + 1
+                iters = i + epoch * len(self.dataloader) + 1
                 # The image is saved every 1000 epoch.
-                if index % args.save_freq == 0:
+                if iters % args.save_freq == 0:
                     vutils.save_image(input,
                                       os.path.join("output", "real_samples.bmp"),
                                       normalize=True)
                     fake = self.generator(fixed_noise, fixed_conditional)
                     vutils.save_image(fake.detach(),
-                                      os.path.join("output", f"fake_samples_{index}.bmp"),
+                                      os.path.join("output", f"fake_samples_{iters}.bmp"),
                                       normalize=True)
 
                     # do checkpointing
-                    torch.save(self.generator.state_dict(), f"weights/netG_iter_{index}.pth")
-                    torch.save(self.discriminator.state_dict(), f"weights/netD_iter_{index}.pth")
+                    torch.save(self.generator.state_dict(), f"weights/netG_iter_{iters}.pth")
+                    torch.save(self.discriminator.state_dict(), f"weights/netD_iter_{iters}.pth")
 
-                if index == int(args.iters):  # If the iteration is reached, exit.
+                if iters == int(args.iters):  # If the iteration is reached, exit.
                     break
