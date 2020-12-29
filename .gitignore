@@ -138,4 +138,5 @@ data/cifar-10-batches-py
 data/TFD
 
 output
+test
 weights/*.pth
