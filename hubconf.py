@@ -23,8 +23,7 @@ from torch.hub import load_state_dict_from_url
 from cgan_pytorch.models import Generator
 
 model_urls = {
-    "mnist": "https://github.com/Lornatang/CGAN-PyTorch/releases/download/0.1.0/mnist-cee83d74.pth",
-    "fashion-mnist": "https://github.com/Lornatang/CGAN-PyTorch/releases/download/0.1.0/fashion_mnist-2111afd9.pth",
+    "mnist": "https://github.com/Lornatang/CGAN-PyTorch/releases/download/0.1.0/mnist-fa290ecd.pth",
 }
 
 dependencies = ["torch"]
@@ -59,13 +58,3 @@ def mnist(pretrained: bool = False, progress: bool = True) -> Generator:
         progress (bool): If True, displays a progress bar of the download to stderr
     """
     return create("mnist", 28, 1, 10, pretrained, progress)
-
-
-def fashion_mnist(pretrained: bool = False, progress: bool = True) -> Generator:
-    r"""GAN model architecture from the
-    `"One weird trick..." <https://arxiv.org/abs/1406.2661>`_ paper.
-    Args:
-        pretrained (bool): If True, returns a model pre-trained on ImageNet
-        progress (bool): If True, displays a progress bar of the download to stderr
-    """
-    return create("fashion-mnist", 28, 1, 10, pretrained, progress)

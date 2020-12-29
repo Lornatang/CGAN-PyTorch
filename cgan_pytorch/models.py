@@ -17,12 +17,11 @@ from torch.hub import load_state_dict_from_url
 
 __all__ = [
     "Discriminator", "Generator", "discriminator",
-    "mnist", "fashion_mnist"
+    "mnist"
 ]
 
 model_urls = {
-    "mnist": "",
-    "fashion-mnist": "",
+    "mnist": "https://github.com/Lornatang/CGAN-PyTorch/releases/download/0.1.0/mnist-fa290ecd.pth",
 }
 
 
@@ -45,11 +44,11 @@ class Discriminator(nn.Module):
         self.label_embedding = nn.Embedding(num_classes, num_classes)
 
         self.main = nn.Sequential(
-            nn.Linear(channels * image_size * image_size + num_classes, 256),
-            nn.LeakyReLU(0.2, inplace=True),
+            nn.Linear(channels * image_size * image_size + num_classes, 512),
+            nn.LeakyReLU(0.2, True),
 
-            nn.Linear(256, 256),
-            nn.LeakyReLU(0.2, inplace=True),
+            nn.Linear(512, 256),
+            nn.LeakyReLU(0.2, True),
 
             nn.Linear(256, 1),
             nn.Sigmoid()
@@ -93,13 +92,22 @@ class Generator(nn.Module):
         self.label_embedding = nn.Embedding(num_classes, num_classes)
 
         self.main = nn.Sequential(
-            nn.Linear(100 + num_classes, 256),
-            nn.ReLU(inplace=True),
+            nn.Linear(100 + num_classes, 128),
+            nn.LeakyReLU(0.2, True),
 
-            nn.Linear(256, 256),
-            nn.ReLU(inplace=True),
+            nn.Linear(128, 256),
+            nn.BatchNorm1d(256),
+            nn.LeakyReLU(0.2, True),
 
-            nn.Linear(256, channels * image_size * image_size),
+            nn.Linear(256, 512),
+            nn.BatchNorm1d(512),
+            nn.LeakyReLU(0.2, True),
+
+            nn.Linear(512, 1024),
+            nn.BatchNorm1d(1024),
+            nn.LeakyReLU(0.2, True),
+
+            nn.Linear(1024, channels * image_size * image_size),
             nn.Tanh()
         )
 
@@ -143,13 +151,3 @@ def mnist(pretrained: bool = False, progress: bool = True) -> Generator:
         progress (bool): If True, displays a progress bar of the download to stderr
     """
     return _gan("mnist", 28, 1, 10, pretrained, progress)
-
-
-def fashion_mnist(pretrained: bool = False, progress: bool = True) -> Generator:
-    r"""GAN model architecture from the
-    `"One weird trick..." <https://arxiv.org/abs/1411.1784>`_ paper.
-    Args:
-        pretrained (bool): If True, returns a model pre-trained on ImageNet
-        progress (bool): If True, displays a progress bar of the download to stderr
-    """
-    return _gan("fashion-mnist", 28, 1, 10, pretrained, progress)
