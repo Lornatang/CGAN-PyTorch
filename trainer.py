@@ -12,6 +12,7 @@
 # limitations under the License.
 # ==============================================================================
 import logging
+import math
 import os
 
 import torch.nn as nn
@@ -47,14 +48,14 @@ class Trainer(object):
         if args.dataset == "mnist":
             dataset = torchvision.datasets.MNIST(root=args.dataroot, download=True,
                                                  transform=transforms.Compose([
-                                                     transforms.Resize(args.image_size),
+                                                     transforms.Resize((args.image_size, args.image_size)),
                                                      transforms.ToTensor(),
                                                      transforms.Normalize((0.5,), (0.5,))
                                                  ]))
         elif args.dataset == "fashion-mnist":
             dataset = torchvision.datasets.FashionMNIST(root=args.dataroot, download=True,
                                                         transform=transforms.Compose([
-                                                            transforms.Resize(args.image_size),
+                                                            transforms.Resize((args.image_size, args.image_size)),
                                                             transforms.ToTensor(),
                                                             transforms.Normalize((0.5,), (0.5,))
                                                         ]))
@@ -62,7 +63,7 @@ class Trainer(object):
             logger.warning("You don't use current dataset. Default use MNIST dataset.")
             dataset = torchvision.datasets.MNIST(root=args.dataroot, download=True,
                                                  transform=transforms.Compose([
-                                                     transforms.Resize(args.image_size),
+                                                     transforms.Resize((args.image_size, args.image_size)),
                                                      transforms.ToTensor(),
                                                      transforms.Normalize((0.5,), (0.5,))
                                                  ]))
@@ -85,8 +86,7 @@ class Trainer(object):
             self.generator = models.__dict__[args.arch](pretrained=True).to(self.device)
         else:
             logger.info(f"Creating model `{args.arch}`")
-            self.generator = models.__dict__[args.arch]().to(
-                self.device)
+            self.generator = models.__dict__[args.arch]().to(self.device)
         logger.info(f"Creating discriminator model")
         self.discriminator = discriminator(image_size=args.image_size,
                                            channels=args.channels,
@@ -96,7 +96,8 @@ class Trainer(object):
         self.discriminator = self.discriminator.apply(weights_init)
 
         # Parameters of pre training model.
-        self.epochs = int(int(args.iters) // len(self.dataloader))
+        self.start_epoch = math.floor(args.start_iter / len(self.dataloader))
+        self.epochs = math.ceil(args.iters / len(self.dataloader))
         self.optimizer_g = torch.optim.Adam(self.generator.parameters(), lr=args.lr, betas=(0.5, 0.999))
         self.optimizer_d = torch.optim.Adam(self.discriminator.parameters(), lr=args.lr, betas=(0.5, 0.999))
 
@@ -126,7 +127,7 @@ class Trainer(object):
         fixed_noise = torch.randn(args.batch_size, 100, device=self.device)
         fixed_conditional = torch.randint(0, args.num_classes, (args.batch_size,), device=self.device)
 
-        for epoch in range(args.start_epoch, self.epochs):
+        for epoch in range(self.start_epoch, self.epochs):
             progress_bar = tqdm(enumerate(self.dataloader), total=len(self.dataloader))
             for i, data in progress_bar:
                 input = data[0].to(self.device)
@@ -137,12 +138,12 @@ class Trainer(object):
                 fake_label = torch.full((batch_size, 1), 0, dtype=input.dtype, device=self.device)
 
                 ##############################################
-                # (1) Update D network: maximize - E(hr)[1- log(D(hr, sr))] - E(sr)[log(D(sr, hr))]
+                # (1) Update D network: max E(x)[log(D(x|y))] + E(z)[log(1- D(z|y))]
                 ##############################################
-                # train with real
                 # Set discriminator gradients to zero.
                 self.discriminator.zero_grad()
 
+                # train with real
                 output = self.discriminator(input, real_conditional)
                 errD_real = self.adversarial_criterion(output, real_label)
                 errD_real.backward()
@@ -159,7 +160,7 @@ class Trainer(object):
                 self.optimizer_d.step()
 
                 ##############################################
-                # (2) Update G network: maximize - E(hr)[log(D(hr, sr))] - E(sr)[1- log(D(sr, hr))]
+                # (2) Update G network: min E(z)[log(1- D(z|y))]
                 ##############################################
                 # Set generator gradients to zero
                 self.generator.zero_grad()
@@ -174,12 +175,20 @@ class Trainer(object):
                                              f"Loss_D: {errD.item():.6f} Loss_G: {errG.item():.6f} "
                                              f"D(x): {D_x:.6f} D(G(z)): {D_G_z1:.6f}/{D_G_z2:.6f}")
 
-                # The image is saved every 1 epoch.
-                if (i + 1) % args.save_freq == 0:
-                    vutils.save_image(input, os.path.join("output", "real_samples.bmp"))
+                index = i + epoch * len(self.dataloader) + 1
+                # The image is saved every 1000 epoch.
+                if index % args.save_freq == 0:
+                    vutils.save_image(input,
+                                      os.path.join("output", "real_samples.bmp"),
+                                      normalize=True)
                     fake = self.generator(fixed_noise, fixed_conditional)
-                    vutils.save_image(fake.detach(), os.path.join("output", f"fake_samples{epoch + 1}.bmp"))
+                    vutils.save_image(fake.detach(),
+                                      os.path.join("output", f"fake_samples_{index}.bmp"),
+                                      normalize=True)
 
-            # do checkpointing
-            torch.save(self.generator.state_dict(), f"weights/netG_epoch_{epoch + 1}.pth")
-            torch.save(self.discriminator.state_dict(), f"weights/netD_epoch_{epoch + 1}.pth")
+                    # do checkpointing
+                    torch.save(self.generator.state_dict(), f"weights/netG_iter_{index}.pth")
+                    torch.save(self.discriminator.state_dict(), f"weights/netD_iter_{index}.pth")
+
+                if index == int(args.iters):  # If the iteration is reached, exit.
+                    break

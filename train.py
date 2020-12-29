@@ -30,7 +30,7 @@ if __name__ == "__main__":
                                                  "technology for pathological microscopic images.")
     # basic parameters
     parser.add_argument("--dataset", type=str, required=True,
-                        help="mnist | fashion-mnist |.")
+                        help="mnist |.")
     parser.add_argument("--dataroot", type=str, default="data",
                         help="Path to dataset. (default: ``data``).")
     parser.add_argument("-j", "--workers", default=4, type=int, metavar="N",
@@ -41,8 +41,8 @@ if __name__ == "__main__":
                         help="device id i.e. `0` or `0,1` or `cpu`. (default: ````).")
 
     # log parameters
-    parser.add_argument("-p", "--save-freq", default=50, type=int,
-                        metavar="N", help="Save frequency. (default: 50).")
+    parser.add_argument("-p", "--save-freq", default=1000, type=int,
+                        metavar="N", help="Save frequency. (default: 1000).")
 
     # model parameters
     parser.add_argument("-a", "--arch", metavar="ARCH", default="mnist",
@@ -58,10 +58,10 @@ if __name__ == "__main__":
                         help="Path to latest generator checkpoint. (default: ````).")
 
     # training parameters
-    parser.add_argument("--start-epoch", default=0, type=int, metavar="N",
-                        help="manual epoch number (useful on restarts)")
-    parser.add_argument("--iters", default=1e5, type=int, metavar="N",
-                        help="The number of iterations is needed in the training of PSNR model. (default: 1e5)")
+    parser.add_argument("--start-iter", default=0, type=int, metavar="N",
+                        help="manual iter number (useful on restarts)")
+    parser.add_argument("--iters", default=50000, type=int, metavar="N",
+                        help="The number of iterations is needed in the training of model. (default: 50000)")
     parser.add_argument("-b", "--batch-size", default=64, type=int, metavar="N",
                         help="mini-batch size (default: 64), this is the total "
                              "batch size of all GPUs on the current node when "
@@ -72,8 +72,8 @@ if __name__ == "__main__":
                         help="The number of channels of the image. (default: 1).")
     parser.add_argument("--num-classes", type=int, default=10,
                         help="Number of classes for dataset. (default: 10).")
-    parser.add_argument("--lr", type=float, default=2e-4,
-                        help="Learning rate. (default:2e-4)")
+    parser.add_argument("--lr", type=float, default=0.0002,
+                        help="Learning rate. (default:0.0002)")
     args = parser.parse_args()
 
     print("##################################################\n")
