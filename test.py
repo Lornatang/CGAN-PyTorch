@@ -60,7 +60,7 @@ if __name__ == "__main__":
 
     logger.info("Creating Testing Engine")
     device = select_device(args.device)
-    model = torch.hub.load("Lornatang/CGAN-PyTorch", args.arch, pretrained=True)
+    model = torch.hub.load("Lornatang/CGAN-PyTorch", args.arch, pretrained=True, progress=True)
     model = model.to(device)
 
     noise = torch.randn(args.num_images, 100, device=device)

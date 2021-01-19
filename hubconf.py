@@ -21,7 +21,7 @@ Usage:
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 
     # Load the model into the specified device.
-    model = torch.hub.load("Lornatang/CGAN-PyTorch", "mnist", pretrained=True, verbose=False)
+    model = torch.hub.load("Lornatang/CGAN-PyTorch", "mnist", pretrained=True, progress=True, verbose=False)
     model.eval()
     model = model.to(device)
 """
