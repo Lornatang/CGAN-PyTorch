@@ -29,8 +29,7 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(format="[ %(levelname)s ] %(message)s", level=logging.INFO)
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Research and application of GAN based super resolution "
-                                                 "technology for pathological microscopic images.")
+    parser = argparse.ArgumentParser(description="An implementation of CGAN algorithm using PyTorch framework.")
     parser.add_argument("-a", "--arch", metavar="ARCH", default="mnist",
                         choices=model_names,
                         help="model architecture: " +
@@ -69,7 +68,7 @@ if __name__ == "__main__":
     with torch.no_grad():
         generated_images = model(noise, conditional)
 
-    vutils.save_image(generated_images, f"{args.outf}/test.bmp")
+    vutils.save_image(generated_images, f"{args.outf}/test.png")
     print("##################################################\n")
 
     logger.info("Test completed successfully.\n")

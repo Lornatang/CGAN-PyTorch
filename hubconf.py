@@ -15,7 +15,15 @@
 """File for accessing GAN via PyTorch Hub https://pytorch.org/hub/
 Usage:
     import torch
-    model = torch.hub.load("Lornatang/CGAN-PyTorch", "mnist", pretrained=True, image_size=28, channels=1, num_classes=10)
+    import torchvision.utils as vutils
+
+    # Choose to use the device.
+    device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+
+    # Load the model into the specified device.
+    model = torch.hub.load("Lornatang/CGAN-PyTorch", "mnist", pretrained=True, verbose=False)
+    model.eval()
+    model = model.to(device)
 """
 import torch
 from torch.hub import load_state_dict_from_url
@@ -45,7 +53,9 @@ def create(arch, image_size, channels, num_classes, pretrained, progress):
     """
     model = Generator(image_size, channels, num_classes)
     if pretrained:
-        state_dict = load_state_dict_from_url(model_urls[arch], progress=progress, map_location=torch.device("cpu"))
+        state_dict = load_state_dict_from_url(model_urls[arch],
+                                              progress=progress,
+                                              map_location=torch.device("cpu"))
         model.load_state_dict(state_dict)
     return model
 

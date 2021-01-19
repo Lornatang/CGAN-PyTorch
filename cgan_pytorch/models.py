@@ -58,11 +58,11 @@ class Discriminator(nn.Module):
         r""" Defines the computation performed at every call.
 
         Args:
-          input (tensor): input tensor into the calculation.
-          labels (list):  input tensor label.
+            input (tensor): input tensor into the calculation.
+            labels (list):  input tensor label.
 
         Returns:
-          A four-dimensional vector (NCHW).
+            A four-dimensional vector (NCHW).
         """
         input = torch.flatten(input, 1)
         conditional = self.label_embedding(labels)
@@ -115,11 +115,11 @@ class Generator(nn.Module):
         r""" Defines the computation performed at every call.
 
         Args:
-          input (tensor): input tensor into the calculation.
-          labels (list):  input tensor label.
+            input (tensor): input tensor into the calculation.
+            labels (list):  input tensor label.
 
         Returns:
-          A four-dimensional vector (NCHW).
+            A four-dimensional vector (NCHW).
         """
         conditional_input = torch.cat([input, self.label_embedding(labels)], dim=-1)
         out = self.main(conditional_input)
@@ -130,7 +130,9 @@ class Generator(nn.Module):
 def _gan(arch, image_size, channels, num_classes, pretrained, progress):
     model = Generator(image_size, channels, num_classes)
     if pretrained:
-        state_dict = load_state_dict_from_url(model_urls[arch], progress=progress)
+        state_dict = load_state_dict_from_url(model_urls[arch],
+                                              progress=progress,
+                                              map_location=torch.device("cpu"))
         model.load_state_dict(state_dict)
     return model
 

@@ -45,36 +45,19 @@ class Trainer(object):
 
         logger.info("Load training dataset")
         # Selection of appropriate treatment equipment.
-        if args.dataset == "mnist":
-            dataset = torchvision.datasets.MNIST(root=args.dataroot, download=True,
-                                                 transform=transforms.Compose([
-                                                     transforms.Resize((args.image_size, args.image_size)),
-                                                     transforms.ToTensor(),
-                                                     transforms.Normalize((0.5,), (0.5,))
-                                                 ]))
-        elif args.dataset == "fashion-mnist":
-            dataset = torchvision.datasets.FashionMNIST(root=args.dataroot, download=True,
-                                                        transform=transforms.Compose([
-                                                            transforms.Resize((args.image_size, args.image_size)),
-                                                            transforms.ToTensor(),
-                                                            transforms.Normalize((0.5,), (0.5,))
-                                                        ]))
-        else:
-            logger.warning("You don't use current dataset. Default use MNIST dataset.")
-            dataset = torchvision.datasets.MNIST(root=args.dataroot, download=True,
-                                                 transform=transforms.Compose([
-                                                     transforms.Resize((args.image_size, args.image_size)),
-                                                     transforms.ToTensor(),
-                                                     transforms.Normalize((0.5,), (0.5,))
-                                                 ]))
-
+        dataset = torchvision.datasets.MNIST(root=args.data, download=True,
+                                             transform=transforms.Compose([
+                                                 transforms.Resize((args.image_size, args.image_size)),
+                                                 transforms.ToTensor(),
+                                                 transforms.Normalize((0.5,), (0.5,))
+                                             ]))
         self.dataloader = torch.utils.data.DataLoader(dataset,
                                                       batch_size=args.batch_size,
                                                       pin_memory=True,
                                                       num_workers=int(args.workers))
 
         logger.info(f"Train Dataset information:\n"
-                    f"\tTrain Dataset dir is `{os.getcwd()}/{args.dataroot}`\n"
+                    f"\tTrain Dataset dir is `{os.getcwd()}/{args.data}`\n"
                     f"\tBatch size is {args.batch_size}\n"
                     f"\tWorkers is {int(args.workers)}\n"
                     f"\tLoad dataset to CUDA")
@@ -98,8 +81,8 @@ class Trainer(object):
         # Parameters of pre training model.
         self.start_epoch = math.floor(args.start_iter / len(self.dataloader))
         self.epochs = math.ceil(args.iters / len(self.dataloader))
-        self.optimizer_g = torch.optim.Adam(self.generator.parameters(), lr=args.lr, betas=(0.5, 0.999))
         self.optimizer_d = torch.optim.Adam(self.discriminator.parameters(), lr=args.lr, betas=(0.5, 0.999))
+        self.optimizer_g = torch.optim.Adam(self.generator.parameters(), lr=args.lr, betas=(0.5, 0.999))
 
         logger.info(f"Model training parameters:\n"
                     f"\tIters is {int(args.iters)}\n"
@@ -177,18 +160,18 @@ class Trainer(object):
 
                 iters = i + epoch * len(self.dataloader) + 1
                 # The image is saved every 1000 epoch.
-                if iters % args.save_freq == 0:
+                if iters % 1000 == 0:
                     vutils.save_image(input,
-                                      os.path.join("output", "real_samples.bmp"),
+                                      os.path.join("output", "real_samples.png"),
                                       normalize=True)
                     fake = self.generator(fixed_noise, fixed_conditional)
                     vutils.save_image(fake.detach(),
-                                      os.path.join("output", f"fake_samples_{iters}.bmp"),
+                                      os.path.join("output", f"fake_samples_{iters}.png"),
                                       normalize=True)
 
                     # do checkpointing
-                    torch.save(self.generator.state_dict(), f"weights/netG_iter_{iters}.pth")
-                    torch.save(self.discriminator.state_dict(), f"weights/netD_iter_{iters}.pth")
+                    torch.save(self.generator.state_dict(), f"weights/{args.arch}_G_iter_{iters}.pth")
+                    torch.save(self.discriminator.state_dict(), f"weights/{args.arch}_D_iter_{iters}.pth")
 
                 if iters == int(args.iters):  # If the iteration is reached, exit.
                     break
