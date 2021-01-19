@@ -13,6 +13,8 @@ of [Conditional Generative Adversarial Networks](http://xxx.itp.ac.cn/pdf/1411.1
     * [Clone and install requirements](#clone-and-install-requirements)
     * [Download pretrained weights](#download-pretrained-weights-eg-mnist)
 4. [Test](#test)
+    * [Torch Hub call](#torch-hub-call)
+    * [Base call](#base-call)
 5. [Train](#train-eg-mnist)
 6. [Contributing](#contributing)
 7. [Credit](#credit)
@@ -54,19 +56,54 @@ $ python3 download_weights.py
 
 ### Test
 
+#### Torch hub call
+
+```python
+# Using Torch Hub library.
+import torch
+import torchvision.utils as vutils
+
+# Choose to use the device.
+device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+
+# Load the model into the specified device.
+model = torch.hub.load("Lornatang/CGAN-PyTorch", "mnist", pretrained=True, verbose=False)
+model.eval()
+model = model.to(device)
+
+# Create random noise image.
+num_images = 64
+number = 1
+conditional = torch.randint(number, number + 1, (num_images,), device=device)
+noise = torch.randn(num_images, 100, device=device)
+
+# The noise is input into the generator model to generate the image.
+with torch.no_grad():
+    generated_images = model(noise, conditional)
+
+# Save generate image.
+vutils.save_image(generated_images, "mnist.png", normalize=True)
+```
+
+#### Base call
+
 Using pre training model to generate pictures.
 
 ```text
-usage: test.py [-h] [-a ARCH] [-n NUM_IMAGES] [--outf PATH] [--device DEVICE]
+usage: test.py [-h] [-a ARCH] [--num-classes NUM_CLASSES]
+               [--number {0,1,2,3,4,5,6,7,8,9}] [-n NUM_IMAGES] [--outf PATH]
+               [--device DEVICE]
 
-Research and application of GAN based super resolution technology for
-pathological microscopic images.
+An implementation of CGAN algorithm using PyTorch framework.
 
 optional arguments:
   -h, --help            show this help message and exit
-  -a ARCH, --arch ARCH  model architecture: _gan | cifar10 | discriminator |
-                        fashion_mnist | load_state_dict_from_url | mnist
-                        (default: mnist)
+  -a ARCH, --arch ARCH  model architecture: _gan | discriminator |
+                        load_state_dict_from_url | mnist (default: mnist)
+  --num-classes NUM_CLASSES
+                        Number of classes for dataset. (default: 10).
+  --number {0,1,2,3,4,5,6,7,8,9}
+                        Specifies the generated number. (default: 1).
   -n NUM_IMAGES, --num-images NUM_IMAGES
                         How many samples are generated at one time. (default:
                         64).
@@ -76,7 +113,7 @@ optional arguments:
                         ``cpu``).
 
 # Example (e.g. MNIST)
-$ python3 test.py -a mnist
+$ python3 test.py -a mnist --number 1
 ```
 
 <span align="center"><img src="assets/mnist.gif" alt="">
@@ -85,57 +122,63 @@ $ python3 test.py -a mnist
 ### Train (e.g. MNIST)
 
 ```text
-usage: train.py [-h] --dataset DATASET [--dataroot DATAROOT] [-j N]
-                [--manualSeed MANUALSEED] [--device DEVICE] [-p N] [-a ARCH]
-                [--model-path PATH] [--pretrained] [--netD PATH] [--netG PATH]
-                [--start-epoch N] [--iters N] [-b N] [--image-size IMAGE_SIZE]
-                [--channels CHANNELS] [--lr LR]
+usage: train.py [-h] --dataset {mnist} [-a ARCH] [-j N] [--start-iter N]
+                [--iters N] [-b N] [--lr LR] [--image-size IMAGE_SIZE]
+                [--channels CHANNELS] [--num-classes NUM_CLASSES]
+                [--pretrained] [--netD PATH] [--netG PATH]
+                [--manualSeed MANUALSEED] [--device DEVICE]
+                DIR
 
-Research and application of GAN based super resolution technology for
-pathological microscopic images.
+An implementation of GAN algorithm using PyTorch framework.
+
+positional arguments:
+  DIR                   path to dataset
 
 optional arguments:
   -h, --help            show this help message and exit
-  --dataset DATASET     mnist | fashion-mnist | cifar10 |.
-  --dataroot DATAROOT   Path to dataset. (default: ``data``).
-  -j N, --workers N     Number of data loading workers. (default:4)
-  --manualSeed MANUALSEED
-                        Seed for initializing training. (default:1111)
-  --device DEVICE       device id i.e. `0` or `0,1` or `cpu`. (default: ````).
-  -p N, --save-freq N   Save frequency. (default: 50).
-  -a ARCH, --arch ARCH  model architecture: cifar10 | discriminator | fashion-mnist |
-                        mnist (default: mnist)
-  --model-path PATH     Path to latest checkpoint for model. (default: ````).
-  --pretrained          Use pre-trained model.
-  --netD PATH           Path to latest discriminator checkpoint. (default:
-                        ````).
-  --netG PATH           Path to latest generator checkpoint. (default: ````).
-  --start-epoch N       manual epoch number (useful on restarts)
+  --dataset {mnist}     mnist.
+  -a ARCH, --arch ARCH  model architecture: _gan | discriminator |
+                        load_state_dict_from_url | mnist (default: mnist)
+  -j N, --workers N     Number of data loading workers. (default:8)
+  --start-iter N        manual iter number (useful on restarts)
   --iters N             The number of iterations is needed in the training of
-                        PSNR model. (default: 1e5)
+                        model. (default: 50000)
   -b N, --batch-size N  mini-batch size (default: 64), this is the total batch
                         size of all GPUs on the current node when using Data
                         Parallel or Distributed Data Parallel.
+  --lr LR               Learning rate. (default:0.0002)
   --image-size IMAGE_SIZE
                         The height / width of the input image to network.
                         (default: 28).
   --channels CHANNELS   The number of channels of the image. (default: 1).
-  --lr LR               Learning rate. (default:3e-4)
+  --num-classes NUM_CLASSES
+                        Number of classes for dataset. (default: 10).
+  --pretrained          Use pre-trained model.
+  --netD PATH           Path to latest discriminator checkpoint. (default:
+                        ````).
+  --netG PATH           Path to latest generator checkpoint. (default: ````).
+  --manualSeed MANUALSEED
+                        Seed for initializing training. (default:1111)
+  --device DEVICE       device id i.e. `0` or `0,1` or `cpu`. (default:
+                        ``0``).
 
 # Example (e.g. MNIST)
-$ python3 train.py -a mnist --dataset mnist --image-size 28 --channels 1 --pretrained
+$ python3 train.py data --dataset mnist -a mnist --image-size 28 --channels 1 --num-classes 10 --pretrained --device 0
 ```
 
 If you want to load weights that you've trained before, run the following command.
 
 ```bash
-$ python3 train.py -a mnist \
+$ python3 train.py data \
                    --dataset mnist \
+                   -a mnist \
                    --image-size 28 \
                    --channels 1 \
-                   --start-epoch 18 \
-                   --netG weights/netG_epoch_18.pth \
-                   --netD weights/netD_epoch_18.pth
+                   --num-classes 10 \
+                   --start-iter 10000 \
+                   --netG weights/mnist_G_iter_10000.pth \
+                   --netD weights/mnist_D_iter_10000.pth \
+                   --device 0
 ```
 
 ### Contributing
