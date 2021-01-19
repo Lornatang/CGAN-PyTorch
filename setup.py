@@ -26,7 +26,7 @@ from shutil import rmtree
 from setuptools import find_packages, setup, Command
 
 # Package meta-data.
-NAME = "gan_pytorch"
+NAME = "cgan_pytorch"
 DESCRIPTION = "An implementation of CGAN algorithm using PyTorch framework."
 URL = "https://github.com/Lornatang/CGAN-PyTorch"
 EMAIL = "liu_changyu@dakewe.com"
