@@ -29,8 +29,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="An implementation of GAN algorithm using PyTorch framework.")
     parser.add_argument("data", metavar="DIR",
                         help="path to dataset")
-    parser.add_argument("--dataset", type=str, required=True, choices=["mnist"],
-                        help="mnist.")
     parser.add_argument("-a", "--arch", metavar="ARCH", default="mnist",
                         choices=model_names,
                         help="model architecture: " +

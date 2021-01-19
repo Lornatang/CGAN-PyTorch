@@ -122,11 +122,10 @@ $ python3 test.py -a mnist --number 1
 ### Train (e.g. MNIST)
 
 ```text
-usage: train.py [-h] --dataset {mnist} [-a ARCH] [-j N] [--start-iter N]
-                [--iters N] [-b N] [--lr LR] [--image-size IMAGE_SIZE]
-                [--channels CHANNELS] [--num-classes NUM_CLASSES]
-                [--pretrained] [--netD PATH] [--netG PATH]
-                [--manualSeed MANUALSEED] [--device DEVICE]
+usage: train.py [-h] [-a ARCH] [-j N] [--start-iter N] [--iters N] [-b N]
+                [--lr LR] [--image-size IMAGE_SIZE] [--channels CHANNELS]
+                [--num-classes NUM_CLASSES] [--pretrained] [--netD PATH]
+                [--netG PATH] [--manualSeed MANUALSEED] [--device DEVICE]
                 DIR
 
 An implementation of GAN algorithm using PyTorch framework.
@@ -136,7 +135,6 @@ positional arguments:
 
 optional arguments:
   -h, --help            show this help message and exit
-  --dataset {mnist}     mnist.
   -a ARCH, --arch ARCH  model architecture: _gan | discriminator |
                         load_state_dict_from_url | mnist (default: mnist)
   -j N, --workers N     Number of data loading workers. (default:8)
@@ -163,7 +161,7 @@ optional arguments:
                         ``0``).
 
 # Example (e.g. MNIST)
-$ python3 train.py data --dataset mnist -a mnist --image-size 28 --channels 1 --num-classes 10 --pretrained --device 0
+$ python3 train.py data -a mnist --image-size 28 --channels 1 --num-classes 10 --pretrained --device 0
 ```
 
 If you want to load weights that you've trained before, run the following command.
