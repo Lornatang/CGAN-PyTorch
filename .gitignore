@@ -58,6 +58,7 @@ coverage.xml
 *.log
 local_settings.py
 db.sqlite3
+db.sqlite3-journal
 
 # Flask stuff:
 instance/
@@ -113,7 +114,6 @@ venv.bak/
 
 # mkdocs documentation
 /site
-
 # mypy
 .mypy_cache/
 .dmypy.json
@@ -122,24 +122,34 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# IDE file
+# custom
 .idea
 .vscode
 
-# Mac file
+# Mac configure file.
 .DS_Store
 
-# custom
+# Dataset
 data/MNIST
-data/TFD
-data/cifar-10-python
-data/cifar-10-python.tar.gz
-data/cifar-10-batches-py
+data/Camelyon16
+data/DF2K
+data/DIV2K
+data/DF2K+OST
+data/Digital-pathology
+data/ImageNet2012
+data/Paper
 
-output
-test
-*.jpg
-*.jpeg
-*.png
+# Program run create directory.
+benchmarks
+tests
+videos
+runs
+weights
+
+# Program run create file.
 *.bmp
-*.pth
+*.png
+*.mp4
+*.zip
+*.csv
+*.json

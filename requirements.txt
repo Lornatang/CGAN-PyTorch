@@ -1,5 +1,6 @@
-torch
-torchvision
-setuptools
-tqdm
-numpy
+torch>=1.8.1+cu111
+torchvision>=0.9.1+cu111
+setuptools>=56.2.0
+Pillow>=8.2.0
+opencv-python>=4.5.2.52
+numpy>=1.19.5
