@@ -45,61 +45,8 @@ model_names = sorted(name for name in models.__dict__ if name.islower() and not 
 logger = logging.getLogger(__name__)
 logging.basicConfig(format="[ %(levelname)s ] %(message)s", level=logging.INFO)
 
-parser = argparse.ArgumentParser()
-parser.add_argument("-a", "--arch", metavar="ARCH", default="cgan",
-                    choices=model_names,
-                    help="Model architecture: " +
-                         " | ".join(model_names) +
-                         ". (Default: cgan)")
-parser.add_argument("data", metavar="DIR",
-                    help="Path to dataset.")
-parser.add_argument("-j", "--workers", default=4, type=int, metavar="N",
-                    help="Number of data loading workers. (Default: 4)")
-parser.add_argument("--epochs", default=128, type=int, metavar="N",
-                    help="Number of total epochs to run. (Default: 128)")
-parser.add_argument("--start-epoch", default=0, type=int, metavar="N",
-                    help="Manual epoch number (useful on restarts). (Default: 0)")
-parser.add_argument("-b", "--batch-size", default=64, type=int,
-                    metavar="N",
-                    help="Mini-batch size (default: 64), this is the total "
-                         "batch size of all GPUs on the current node when "
-                         "using Data Parallel or Distributed Data Parallel.")
-parser.add_argument("--lr", type=float, default=0.0002,
-                    help="Learning rate. (Default: 0.0002)")
-parser.add_argument("--image-size", type=int, default=28,
-                    help="Image size of high resolution image. (Default: 28)")
-parser.add_argument("--channels", type=int, default=1,
-                    help="The number of channels of the image. (Default: 1)")
-parser.add_argument("--num-classes", type=int, default=10,
-                    help="Number of classes for dataset. (Default: 10)")
-parser.add_argument("--netD", default="", type=str, metavar="PATH",
-                    help="Path to Discriminator checkpoint.")
-parser.add_argument("--netG", default="", type=str, metavar="PATH",
-                    help="Path to Generator checkpoint.")
-parser.add_argument("--pretrained", dest="pretrained", action="store_true",
-                    help="Use pre-trained model.")
-parser.add_argument("--world-size", default=-1, type=int,
-                    help="Number of nodes for distributed training.")
-parser.add_argument("--rank", default=-1, type=int,
-                    help="Node rank for distributed training. (Default: -1)")
-parser.add_argument("--dist-url", default="tcp://59.110.31.55:12345", type=str,
-                    help="url used to set up distributed training. (Default: `tcp://59.110.31.55:12345`)")
-parser.add_argument("--dist-backend", default="nccl", type=str,
-                    help="Distributed backend. (Default: `nccl`)")
-parser.add_argument("--seed", default=None, type=int,
-                    help="Seed for initializing training.")
-parser.add_argument("--gpu", default=None, type=int,
-                    help="GPU id to use.")
-parser.add_argument("--multiprocessing-distributed", action="store_true",
-                    help="Use multi-processing distributed training to launch "
-                         "N processes per node, which has N GPUs. This is the "
-                         "fastest way to use PyTorch for either single node or "
-                         "multi node data parallel training.")
 
-
-def main():
-    args = parser.parse_args()
-
+def main(args):
     if args.seed is not None:
         # In order to make the model repeatable, the first step is to set random seeds, and the second step is to set convolution algorithm.
         random.seed(args.seed)
@@ -342,6 +289,58 @@ def main_worker(gpu, ngpus_per_node, args):
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-a", "--arch", metavar="ARCH", default="cgan",
+                        choices=model_names,
+                        help="Model architecture: " +
+                             " | ".join(model_names) +
+                             ". (Default: cgan)")
+    parser.add_argument("data", metavar="DIR",
+                        help="Path to dataset.")
+    parser.add_argument("-j", "--workers", default=4, type=int, metavar="N",
+                        help="Number of data loading workers. (Default: 4)")
+    parser.add_argument("--epochs", default=128, type=int, metavar="N",
+                        help="Number of total epochs to run. (Default: 128)")
+    parser.add_argument("--start-epoch", default=0, type=int, metavar="N",
+                        help="Manual epoch number (useful on restarts). (Default: 0)")
+    parser.add_argument("-b", "--batch-size", default=64, type=int,
+                        metavar="N",
+                        help="Mini-batch size (default: 64), this is the total "
+                             "batch size of all GPUs on the current node when "
+                             "using Data Parallel or Distributed Data Parallel.")
+    parser.add_argument("--lr", type=float, default=0.0002,
+                        help="Learning rate. (Default: 0.0002)")
+    parser.add_argument("--image-size", type=int, default=28,
+                        help="Image size of high resolution image. (Default: 28)")
+    parser.add_argument("--channels", type=int, default=1,
+                        help="The number of channels of the image. (Default: 1)")
+    parser.add_argument("--num-classes", type=int, default=10,
+                        help="Number of classes for dataset. (Default: 10)")
+    parser.add_argument("--netD", default="", type=str, metavar="PATH",
+                        help="Path to Discriminator checkpoint.")
+    parser.add_argument("--netG", default="", type=str, metavar="PATH",
+                        help="Path to Generator checkpoint.")
+    parser.add_argument("--pretrained", dest="pretrained", action="store_true",
+                        help="Use pre-trained model.")
+    parser.add_argument("--world-size", default=-1, type=int,
+                        help="Number of nodes for distributed training.")
+    parser.add_argument("--rank", default=-1, type=int,
+                        help="Node rank for distributed training. (Default: -1)")
+    parser.add_argument("--dist-url", default="tcp://59.110.31.55:12345", type=str,
+                        help="url used to set up distributed training. (Default: `tcp://59.110.31.55:12345`)")
+    parser.add_argument("--dist-backend", default="nccl", type=str,
+                        help="Distributed backend. (Default: `nccl`)")
+    parser.add_argument("--seed", default=None, type=int,
+                        help="Seed for initializing training.")
+    parser.add_argument("--gpu", default=None, type=int,
+                        help="GPU id to use.")
+    parser.add_argument("--multiprocessing-distributed", action="store_true",
+                        help="Use multi-processing distributed training to launch "
+                             "N processes per node, which has N GPUs. This is the "
+                             "fastest way to use PyTorch for either single node or "
+                             "multi node data parallel training.")
+    args = parser.parse_args()
+
     print("##################################################\n")
     print("Run Training Engine.\n")
 
@@ -353,6 +352,6 @@ if __name__ == "__main__":
     print("\tBuild ................ 2021.05.31")
     print("##################################################\n")
 
-    main()
+    main(args)
 
     logger.info("All training has been completed successfully.\n")
