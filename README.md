@@ -86,22 +86,23 @@ vutils.save_image(generated_images, "mnist.png", normalize=True)
 Using pre training model to generate pictures.
 
 ```text
-usage: test.py [-h] [-a ARCH] [--number {0,1,2,3,4,5,6,7,8,9}] [--num-images NUM_IMAGES] [--model-path PATH] [--pretrained] [--seed SEED] [--gpu GPU]
+usage: test.py [-h] [--arch {cgan}] [--conditional {0,1,2,3,4,5,6,7,8,9}] [--num-images NUM_IMAGES] [--model-path MODEL_PATH] [--pretrained] [--seed SEED] [--gpu GPU]
 
 optional arguments:
   -h, --help            show this help message and exit
-  -a ARCH, --arch ARCH  model architecture: cgan. (Default: `cgan`)
-  --number {0,1,2,3,4,5,6,7,8,9}
-                        Specifies the generated number. (Default: 1)
+  --arch {cgan}         model architecture: cgan. (Default: `cgan`)
+  --conditional {0,1,2,3,4,5,6,7,8,9}
+                        Specifies the generated conditional. (Default: 1)
   --num-images NUM_IMAGES
                         How many samples are generated at one time. (Default: 64)
-  --model-path PATH     Path to latest checkpoint for model.
+  --model-path MODEL_PATH
+                        Path to latest checkpoint for model. (Default: `weights/GAN-last.pth`)
   --pretrained          Use pre-trained model.
-  --seed SEED           Seed for initializing training. (Default: 666)
+  --seed SEED           Seed for initializing testing.
   --gpu GPU             GPU id to use.
 
 # Example (e.g. MNIST)
-$ python3 test.py -a cgan --number 1 --gpu 0
+$ python3 test.py --arch cgan --conditional 1 --gpu 0
 ```
 
 <span align="center"><img src="assets/mnist.gif" alt="">
@@ -110,8 +111,8 @@ $ python3 test.py -a cgan --number 1 --gpu 0
 ### Train (e.g. MNIST)
 
 ```text
-usage: train.py [-h] [-a ARCH] [-j N] [--epochs N] [--start-epoch N] [-b N] [--lr LR] [--image-size IMAGE_SIZE] [--channels CHANNELS] [--num-classes NUM_CLASSES] [--netD PATH] [--netG PATH] [--pretrained] [--world-size WORLD_SIZE] [--rank RANK]
-                [--dist-url DIST_URL] [--dist-backend DIST_BACKEND] [--seed SEED] [--gpu GPU] [--multiprocessing-distributed]
+usage: train.py [-h] [--arch {cgan}] [--workers WORKERS] [--epochs EPOCHS] [--start-epoch START_EPOCH] [-b BATCH_SIZE] [--lr LR] [--image-size IMAGE_SIZE] [--channels CHANNELS] [--netD NETD] [--netG NETG] [--pretrained] [--world-size WORLD_SIZE]
+                [--rank RANK] [--dist-url DIST_URL] [--dist-backend DIST_BACKEND] [--seed SEED] [--gpu GPU] [--multiprocessing-distributed]
                 DIR
 
 positional arguments:
@@ -119,19 +120,19 @@ positional arguments:
 
 optional arguments:
   -h, --help            show this help message and exit
-  -a ARCH, --arch ARCH  Model architecture: cgan. (Default: cgan)
-  -j N, --workers N     Number of data loading workers. (Default: 4)
-  --epochs N            Number of total epochs to run. (Default: 128)
-  --start-epoch N       Manual epoch number (useful on restarts). (Default: 0)
-  -b N, --batch-size N  Mini-batch size (default: 64), this is the total batch size of all GPUs on the current node when using Data Parallel or Distributed Data Parallel.
+  --arch {cgan}         Model architecture: cgan. (Default: `cgan`)
+  --workers WORKERS     Number of data loading workers. (Default: 4)
+  --epochs EPOCHS       Number of total epochs to run. (Default: 128)
+  --start-epoch START_EPOCH
+                        Manual epoch number (useful on restarts). (Default: 0)
+  -b BATCH_SIZE, --batch-size BATCH_SIZE
+                        The batch size of the dataset. (Default: 64)
   --lr LR               Learning rate. (Default: 0.0002)
   --image-size IMAGE_SIZE
                         Image size of high resolution image. (Default: 28)
   --channels CHANNELS   The number of channels of the image. (Default: 1)
-  --num-classes NUM_CLASSES
-                        Number of classes for dataset. (Default: 10)
-  --netD PATH           Path to Discriminator checkpoint.
-  --netG PATH           Path to Generator checkpoint.
+  --netD NETD           Path to Discriminator checkpoint.
+  --netG NETG           Path to Generator checkpoint.
   --pretrained          Use pre-trained model.
   --world-size WORLD_SIZE
                         Number of nodes for distributed training.
@@ -145,13 +146,13 @@ optional arguments:
                         Use multi-processing distributed training to launch N processes per node, which has N GPUs. This is the fastest way to use PyTorch for either single node or multi node data parallel training.
 
 # Example (e.g. MNIST)
-$ python3 train.py -a cgan --gpu 0 data
+$ python3 train.py --arch cgan --gpu 0 data
 ```
 
 If you want to load weights that you've trained before, run the following command.
 
 ```bash
-$ python3 train.py -a cgan data --netD weights/Discriminator_epoch8.pth --netG weights/Generator_epoch8.pth --start-epoch 8 --gpu 0 data
+$ python3 train.py --arch cgan --netD weights/Discriminator_epoch8.pth --netG weights/Generator_epoch8.pth --start-epoch 8 --gpu 0 data
 ```
 
 ### Contributing

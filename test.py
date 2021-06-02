@@ -52,53 +52,51 @@ def main(args):
     model = configure(args)
     # If special choice model path.
     if args.model_path is not None:
+        logger.info(f"You loaded the specified weight. Load weights from `{os.path.abspath(args.model_path)}`.")
         model.load_state_dict(torch.load(args.model_path, map_location=torch.device("cpu")))
     # Switch model to eval mode.
     model.eval()
 
     # If the GPU is available, load the model into the GPU memory. This speed.
-    if not torch.cuda.is_available():
-        logger.warning("Using CPU, this will be slow.")
     if args.gpu is not None:
         torch.cuda.set_device(args.gpu)
         model = model.cuda(args.gpu)
-        # Setting this flag allows the built-in auto tuner of cudnn to automatically find the most efficient algorithm suitable
-        # for the current configuration, so as to optimize the operation efficiency.
-        cudnn.benchmark = True
-        # Ensure that every time the same input returns the same result.
-        cudnn.deterministic = True
 
+    # Randomly generate a Gaussian noise map.
+    logger.info("Randomly generate a Gaussian noise image.")
     noise = torch.randn([args.num_images, 100])
-    conditional = torch.randint(args.number, args.number + 1, (args.num_images,))
+    conditional = torch.randint(args.conditional, args.conditional + 1, (args.num_images,))
     # Move data to special device.
     if args.gpu is not None:
-        noise = noise.cuda(args.gpu, non_blocking=True)
-        conditional = conditional.cuda(args.gpu, non_blocking=True)
+        noise = noise.cuda(args.gpu)
+        conditional = conditional.cuda(args.gpu)
 
     # It only needs to reconstruct the low resolution image without the gradient information of the reconstructed image.
     with torch.no_grad():
+        logger.info("Generating...")
         generated_images = model(noise, conditional)
 
-    vutils.save_image(generated_images, os.path.join("tests", "test.png"), normalize=True)
+    save_path = os.path.join("tests", "test.png")
+    logger.info(f"Saving image to `{save_path}`...")
+    vutils.save_image(generated_images, save_path, normalize=True)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-a", "--arch", metavar="ARCH", default="cgan",
-                        choices=model_names,
+    parser.add_argument("--arch", default="cgan", type=str, choices=model_names,
                         help="model architecture: " +
                              " | ".join(model_names) +
                              ". (Default: `cgan`)")
-    parser.add_argument("--number", type=int, default=1, choices=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-                        help="Specifies the generated number. (Default: 1)")
-    parser.add_argument("--num-images", type=int, default=64,
+    parser.add_argument("--conditional", default=1, type=int, choices=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+                        help="Specifies the generated conditional. (Default: 1)")
+    parser.add_argument("--num-images", default=64, type=int,
                         help="How many samples are generated at one time. (Default: 64)")
-    parser.add_argument("--model-path", default=None, type=str, metavar="PATH",
-                        help="Path to latest checkpoint for model.")
+    parser.add_argument("--model-path", default="weights/GAN-last.pth", type=str,
+                        help="Path to latest checkpoint for model. (Default: `weights/GAN-last.pth`)")
     parser.add_argument("--pretrained", dest="pretrained", action="store_true",
                         help="Use pre-trained model.")
     parser.add_argument("--seed", default=None, type=int,
-                        help="Seed for initializing training.")
+                        help="Seed for initializing testing.")
     parser.add_argument("--gpu", default=None, type=int,
                         help="GPU id to use.")
     args = parser.parse_args()
@@ -110,7 +108,7 @@ if __name__ == "__main__":
 
     logger.info("TestEngine:")
     print("\tAPI version .......... 0.2.0")
-    print("\tBuild ................ 2021.05.31")
+    print("\tBuild ................ 2021.06.02")
     print("##################################################\n")
     main(args)
 

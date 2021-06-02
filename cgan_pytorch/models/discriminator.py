@@ -55,8 +55,8 @@ class DiscriminatorForMNIST(nn.Module):
         """
         inputs = torch.flatten(inputs, 1)
         conditional = self.label_embedding(labels)
-        conditional_input = torch.cat([inputs, conditional], dim=-1)
-        out = self.main(conditional_input)
+        conditional_inputs = torch.cat([inputs, conditional], dim=-1)
+        out = self.main(conditional_inputs)
 
         return out
 

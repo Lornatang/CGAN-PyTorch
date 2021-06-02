@@ -13,7 +13,7 @@
 # ==============================================================================
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
+import torch.nn.functional
 
 __all__ = [
     "FReLU", "HSigmoid", "HSwish", "Mish", "Sine", "Swish"
@@ -46,7 +46,9 @@ class FReLU(nn.Module):
 
     def forward(self, x: torch.Tensor):
         out = self.FReLU(x)
-        return torch.max(x, out)
+        out = torch.max(x, out)
+
+        return out
 
 
 class HSigmoid(nn.Module):
@@ -62,7 +64,9 @@ class HSigmoid(nn.Module):
 
     @staticmethod
     def forward(x: torch.Tensor) -> torch.Tensor:
-        return F.relu6(x + 3, inplace=True) / 6.
+        out = torch.nn.functional.relu6(x + 3, inplace=True) / 6.
+
+        return out
 
 
 class HSwish(nn.Module):
@@ -78,7 +82,9 @@ class HSwish(nn.Module):
 
     @staticmethod
     def forward(x: torch.Tensor) -> torch.Tensor:
-        return x * F.relu6(x + 3, inplace=True) / 6.
+        out = x * torch.nn.functional.relu6(x + 3, inplace=True) / 6.
+
+        return out
 
 
 class Mish(nn.Module):
@@ -102,7 +108,9 @@ class Mish(nn.Module):
 
     @staticmethod
     def forward(x: torch.Tensor) -> torch.Tensor:
-        return x * (torch.tanh(F.softplus(x)))
+        out = x * (torch.tanh(torch.nn.functional.softplus(x)))
+
+        return out
 
 
 class Sine(nn.Module):
@@ -119,7 +127,9 @@ class Sine(nn.Module):
     @staticmethod
     def forward(x: torch.Tensor) -> torch.Tensor:
         # See paper sec. 3.2, final paragraph, and supplement Sec. 1.5 for discussion of factor 30.
-        return torch.sin(30 * x)
+        out = torch.sin(30 * x)
+
+        return out
 
 
 class Swish(nn.Module):
@@ -135,4 +145,6 @@ class Swish(nn.Module):
 
     @staticmethod
     def forward(x: torch.Tensor) -> torch.Tensor:
-        return x * F.sigmoid(x)
+        out = x * torch.nn.functional.sigmoid(x)
+
+        return out

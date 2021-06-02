@@ -69,8 +69,8 @@ class Generator(nn.Module):
             A four-dimensional vector (N*C*H*W).
         """
 
-        conditional_input = torch.cat([inputs, self.label_embedding(labels)], dim=-1)
-        out = self.main(conditional_input)
+        conditional_inputs = torch.cat([inputs, self.label_embedding(labels)], dim=-1)
+        out = self.main(conditional_inputs)
         out = out.reshape(out.size(0), self.channels, self.image_size, self.image_size)
 
         return out
@@ -108,9 +108,11 @@ def _gan(arch: str, image_size: int, channels: int, pretrained: bool, progress: 
         Generator model.
     """
     model = Generator(image_size, channels)
+
     if pretrained:
         state_dict = load_state_dict_from_url(model_urls[arch], progress=progress, map_location=torch.device("cpu"))
         model.load_state_dict(state_dict)
+
     return model
 
 
@@ -121,4 +123,6 @@ def cgan(pretrained: bool = False, progress: bool = True) -> Generator:
         pretrained (bool): If True, returns a model pre-trained on ImageNet.
         progress (bool): If True, displays a progress bar of the download to stderr.
     """
-    return _gan("cgan", 28, 1, pretrained, progress)
+    model = _gan("cgan", 28, 1, pretrained, progress)
+
+    return model
