@@ -209,7 +209,7 @@ def main_worker(ngpus_per_node, args):
             fake_label = torch.full((batch_size, 1), 0, dtype=inputs.dtype).cuda(args.gpu, non_blocking=True)
 
             noise = torch.randn([batch_size, 100])
-            conditional = torch.randint(6, 7, (batch_size,))
+            conditional = torch.randint(0, 10, (batch_size,))
             # Move data to special device.
             if args.gpu is not None:
                 noise = noise.cuda(args.gpu, non_blocking=True)
